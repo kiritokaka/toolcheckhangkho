@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tool Tìm Kiếm Sản Phẩm</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f9;
+      padding: 30px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    input, select, button {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      min-width: 180px;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    .product {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px auto;
+      max-width: 600px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .highlight {
+      font-weight: bold;
+      color: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tìm kiếm sản phẩm</h1>
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Tìm theo tên sản phẩm..." />
+    <select id="typeFilter">
+      <option value="">Tất cả loại</option>
+      <option value="Giày">Giày</option>
+      <option value="Vợt">Vợt</option>
+    </select>
+    <input type="text" id="colorFilter" placeholder="Lọc theo màu..." />
+    <input type="text" id="sizeFilter" placeholder="Lọc theo size..." />
+    <button id="searchBtn">Tìm kiếm</button>
+  </div>
+  <div id="results"></div>
+
+  <script src="products_data_full_updated.js"></script>
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const typeFilter = document.getElementById('typeFilter');
+    const colorFilter = document.getElementById('colorFilter');
+    const sizeFilter = document.getElementById('sizeFilter');
+    const resultsDiv = document.getElementById('results');
+    const searchBtn = document.getElementById('searchBtn');
+
+    function render(products) {
+      if (!products.length) {
+        resultsDiv.innerHTML = '<p>Không tìm thấy sản phẩm nào phù hợp.</p>';
+        return;
+      }
+      resultsDiv.innerHTML = products.map(p => `
+        <div class="product">
+          <div><span class="highlight">${p.type}</span>: ${p.name}</div>
+          <div>Số lượng: ${p.quantity} | Size: ${p.size}</div>
+          <div>Màu: ${p.color}</div>
+          <div>Giá sỉ: ${(+p.price).toLocaleString()}đ</div>
+        </div>
+      `).join('');
+    }
+
+    function filterProducts() {
+      const keyword = searchInput.value.toLowerCase().trim();
+      const type = typeFilter.value;
+      const color = colorFilter.value.toLowerCase().trim();
+      const size = sizeFilter.value.toLowerCase().trim();
+
+      const filtered = products.filter(p => {
+        return (
+          (!type || p.type === type) &&
+          (!keyword || p.name.toLowerCase().includes(keyword)) &&
+          (!color || (p.color && p.color.toLowerCase().includes(color))) &&
+          (!size || (p.size && p.size.toString().toLowerCase().includes(size)))
+        );
+      });
+
+      render(filtered);
+    }
+
+    searchBtn.addEventListener('click', filterProducts);
+    searchInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        filterProducts();
+      }
+    });
+  </script>
+</body>
+</html>
